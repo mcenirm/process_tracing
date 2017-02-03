@@ -36,7 +36,7 @@ class Tracing:
         """
         if type(process) == int:
             self.process = psutil.Process(process)
-        elif type(process) == psutil.Process:
+        elif isinstance(process, psutil.Process):
             self.process = process
         else:
             raise AttributeError("The specified process needs to be a valid PID or psutil.Process instance")
