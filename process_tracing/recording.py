@@ -98,7 +98,7 @@ class TracingRecord(object):
         """
         self._save_log_message(LogRecord(message))
 
-    def runtime_log(self, message_type, message=None, signal=None, exit_code=None, child_pid=None):
+    def runtime_log(self, message_type, message=None, signal=None, exit_code=None, child_pid=None, process=None):
         """
         Record the given message (of process related recording is enabled)
         :param message_type: Process action type
@@ -106,10 +106,11 @@ class TracingRecord(object):
         :param signal: Received signal number
         :param exit_code: Exit code to associate with the log entry
         :param child_pid: Child pid to associate with the object
+        :param process: psutil.Process instance
         :return: None
         """
         if self.mode & TRACING_MODE_RUNTIME_TRACING:
-            record = RuntimeActionRecord(message_type, message, signal, exit_code, child_pid)
+            record = RuntimeActionRecord(message_type, message, signal, exit_code, child_pid, process=process)
             self._save_log_message(record)
 
             if message_type == RuntimeActionRecord.TYPE_EXITED:
@@ -236,7 +237,7 @@ class RuntimeActionRecord(LogRecord):
     TYPE_EXEC = 3
     TYPE_SPAWN_CHILD = 4
 
-    def __init__(self, message_type, message=None, signal=None, exit_code=None, child_pid=None):
+    def __init__(self, message_type, message=None, signal=None, exit_code=None, child_pid=None, process=None):
         """
         Create a record for the given message
         :param message_type: Type of the message that occurred
@@ -244,6 +245,7 @@ class RuntimeActionRecord(LogRecord):
         :param signal: Received signal number
         :param exit_code: Exit code to associate with the log entry
         :param child_pid: Child pid to associate with the object
+        :param process: psutil.Process instance
 
         """
         super().__init__(message)
@@ -256,6 +258,7 @@ class RuntimeActionRecord(LogRecord):
             self.child_pid = child_pid
         else:
             self.child_pid = None
+        self.process = process
 
     def get_log_message_items(self):
         return ["run", self.timestamp, RuntimeActionRecord._get_type_name(self.type), self.message, self.exit_code,

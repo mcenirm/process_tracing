@@ -509,7 +509,7 @@ class TracingThread(Thread):
         :return: None
         """
         process = event.process
-        record.runtime_log(RuntimeActionRecord.TYPE_EXITED, signal=event.signum, exit_code=event.exitcode)
+        record.runtime_log(RuntimeActionRecord.TYPE_EXITED, signal=event.signum, exit_code=event.exitcode, process=process)
 
         # Detach from tracing
         process.detach()
@@ -524,7 +524,7 @@ class TracingThread(Thread):
         parent = event.process.parent
         process = event.process
 
-        record.runtime_log(RuntimeActionRecord.TYPE_SPAWN_CHILD, child_pid=process.pid)
+        record.runtime_log(RuntimeActionRecord.TYPE_SPAWN_CHILD, child_pid=process.pid, process=process)
         TracingThread._trace_continue(parent)
 
         # Start new tracing thread for the new process
